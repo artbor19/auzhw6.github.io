@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Homework 6</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Retrieved data will be dumped here -->
+  <div class = "container">
+      <h1>Weather Dashboard</h1>
+
+      <div class = "row">
+          <div class = "col-sm-3">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    <form class="form-inline">
+                        <div class="form-group mx-sm-3 mb-2">
+                          <label for="citySearch" class="sr-only">City Name</label>
+                          <input type="text" class="form-control" id="citySearch" placeholder="City Name">
+                        </div>
+                        <button type="button" class="btn btn-primary mb-2">Search</button>
+                    </form>
+                </div>
+                <h5>History & Recommended</h5>
+                <ul class="list-group list-group-flush">
+                </ul>
+              </div>
+          </div>
+          <div class = "col-sm-9">
+            <div class="card">
+              <div class="card-body">
+                <div class="card-title city"></div>
+                <div class="wind"></div>
+                <div class="humidity"></div>
+                <div class="temp"></div>
+                <img id="pic" alt = "WeatherIcon">
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header date1">
+                
+              </div>
+              <div class="card-body">
+                <h4 class="card-title weather1"></h4>  
+                <img id="pic1" alt = "WeatherIcon">                             
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header date2">
+                
+              </div>
+              <div class="card-body">
+                <h4 class="card-title weather2"></h4>  
+                <img id="pic2" alt = "WeatherIcon">                              
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header date3">
+                
+              </div>
+              <div class="card-body">
+                <h4 class="card-title weather3"></h4>  
+                <img id="pic3" alt = "WeatherIcon">                              
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header date4">
+                
+              </div>
+              <div class="card-body">
+                <h4 class="card-title weather4"></h4>
+                <img id="pic4" alt = "WeatherIcon">                                
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header date5">
+                
+              </div>
+              <div class="card-body">
+                <h4 class="card-title weather5"></h4>  
+                <img id="pic5" alt = "WeatherIcon">                              
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+
+    var APIkey = "a97bd0d2d79dfcdbd99acfdd2c3d00d7";
+
+    var otherKey = "8ff38c42bd38a3ccab5421e55fc36b16";
+
+    var city= "";
+
+    var days = "6";
+
+    var cityList = [];
+    
+    function updateList(){ 
+      cityList = JSON.parse(localStorage.getItem('cities'));     
+      $(".list-group-flush").empty();      
+      if(!cityList){
+        cityList = ["Boulder", "Denver"];   
+        for(var i = 0; i < cityList.length; i++){
+          var city = $("<li>").text(cityList[i]);
+          city.attr("class", "list-group-item list-group-item-warning");
+          city.attr("value", cityList[i]);
+          $(".list-group-flush").prepend(city);
+          $("li").on("click", function(){
+            fetchCity($(this).attr("value"));  
+          })
+          fetchCity(cityList[i]); 
+        }     
+      }
+      else{
+        for(var i = 0; i < cityList.length; i++){
+          var city = $("<li>").text(cityList[i]);
+          city.attr("class", "list-group-item list-group-item-warning");
+          city.attr("value", cityList[i]);
+          $(".list-group-flush").prepend(city);
+          $("li").on("click", function(){
+            fetchCity($(this).attr("value"));  
+          }) 
+          if(i === cityList.length-1){
+            fetchCity(cityList[i]);
+          }
+        }
+      }
+    }
+
+    updateList();
+
+    function fetchCity(value){
+        city = value;
+        var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + otherKey;
+        var otherURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + otherKey;
+
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+            }).then(function (response){
+            var tempk = response.main.temp;
+            var tempc = tempk - 273.15;
+            var temp = (tempc * 1.8) + 32;
+            var tempf = temp.toFixed(2);
+            $(".city").html("<h2>" + response.name + "</h2>");
+            $(".wind").html("<h3>" + "Wind Speed: " + response.wind.speed + " MPH" + "</h3>");
+            $(".humidity").html("<h3>" + "Humidity: " + response.main.humidity + "%" + "</h3>");
+            $(".temp").html("<h3>" + "Temperature:" + tempf + "&#8457" + "</h3>");
+            $("#pic").attr("src", "http://openweathermap.org/img/w/" + response.weather[0].icon + ".png");
+        })
+
+        $.ajax({
+          url: otherURL,
+          method: "GET"
+        }).then(function(response){
+
+          var tempk1 = response.list[3].main.temp;
+          var tempc1 = tempk1 - 273.15;
+          var temp1 = (tempc1 * 1.8) + 32;
+          var tempf1 = temp1.toFixed(2);
+          $(".date1").text(response.list[3].dt_txt.substring(0,10));
+          $(".weather1").text("Temperature: " + tempf1 + ", Humidity: " + response.list[3].main.humidity);
+          $("#pic1").attr("src", "http://openweathermap.org/img/w/" + response.list[3].weather[0].icon + ".png");
+
+          $(".date2").text(response.list[11].dt_txt.substring(0,10));
+          var tempk2 = response.list[11].main.temp;
+          var tempc2 = tempk2 - 273.15;
+          var temp2 = (tempc2 * 1.8) + 32;
+          var tempf2 = temp2.toFixed(2);
+          $(".weather2").text("Temperature: " + tempf2 + ", Humidity: " + response.list[11].main.humidity)
+          $("#pic2").attr("src", "http://openweathermap.org/img/w/" + response.list[11].weather[0].icon + ".png");
+
+          $(".date3").text(response.list[19].dt_txt.substring(0,10));
+          var tempk3 = response.list[19].main.temp;
+          var tempc3 = tempk3 - 273.15;
+          var temp3 = (tempc3 * 1.8) + 32;
+          var tempf3 = temp3.toFixed(2);
+          $(".weather3").text("Temperature: " + tempf3 + ", Humidity: " + response.list[19].main.humidity)
+          $("#pic3").attr("src", "http://openweathermap.org/img/w/" + response.list[19].weather[0].icon + ".png");
+
+          $(".date4").text(response.list[27].dt_txt.substring(0,10)); 
+          var tempk4 = response.list[27].main.temp;
+          var tempc4 = tempk4 - 273.15;
+          var temp4 = (tempc4 * 1.8) + 32;
+          var tempf4 = temp4.toFixed(2);
+          $(".weather4").text("Temperature: " + tempf4 + ", Humidity: " + response.list[27].main.humidity)
+          $("#pic4").attr("src", "http://openweathermap.org/img/w/" + response.list[27].weather[0].icon + ".png");
+
+          $(".date5").text(response.list[35].dt_txt.substring(0,10));
+          var tempk5 = response.list[35].main.temp;
+          var tempc5 = tempk5 - 273.15;
+          var temp5 = (tempc5 * 1.8) + 32;
+          var tempf5 = temp5.toFixed(2);
+          $(".weather5").text("Temperature: " + tempf5 + ", Humidity: " + response.list[35].main.humidity)
+          $("#pic5").attr("src", "http://openweathermap.org/img/w/" + response.list[35].weather[0].icon + ".png"); 
+        });
+    }
+    
+    $("button").on("click", function(){
+        fetchCity($("#citySearch").val().trim());
+        cityList.push($("#citySearch").val().trim());
+        localStorage.setItem("cities", JSON.stringify(cityList));
+        updateList();
+    });
+
+    $('#citySearch').keydown(function (e) {
+      if (e.keyCode == 13) {
+          e.preventDefault();
+          fetchCity($("#citySearch").val().trim());
+          cityList.push($("#citySearch").val().trim());
+          localStorage.setItem("cities", JSON.stringify(cityList));
+          console.log(cityList)
+          updateList();
+      }
+    });;
+    
+  </script>
+
+</body>
+
+</html>

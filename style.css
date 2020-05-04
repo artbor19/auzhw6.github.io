@@ -1,0 +1,27 @@
+h1{
+    color: white;
+    background-color: dimgray;
+    text-align: center;
+    padding-bottom: 5px;
+    margin-top: 0%;
+}
+button{
+    display: block;
+    margin: auto auto;
+ }
+.list-group-item-warning{
+    color: dodgerblue;
+    font-weight: bolder;
+    text-align: center;
+}
+.list-group-item-warning:hover{
+    background-color: rgb(135, 251, 2);
+    color: dodgerblue;
+    font-weight: bolder;
+    text-align: center;
+}
+h5{
+    color: rgb(236, 252, 23);
+    background-color: blue;
+    text-align: center;
+}
